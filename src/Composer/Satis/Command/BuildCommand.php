@@ -34,6 +34,7 @@ use Composer\Repository\ComposerRepository;
 use Composer\Repository\PlatformRepository;
 use Composer\Json\JsonFile;
 use Composer\Satis\Satis;
+use Composer\Satis\Event\PreArchiveDumpEvent;
 use Composer\Factory;
 use Composer\Util\Filesystem;
 use Composer\Util\RemoteFilesystem;
@@ -156,7 +157,7 @@ EOT
         }
 
         if (isset($config['archive']['directory'])) {
-            $this->dumpDownloads($config, $packages, $input, $output, $outputDir, $skipErrors);
+            $this->dumpDownloads($composer, $config, $packages, $input, $output, $outputDir, $skipErrors);
         }
 
         $filenamePrefix = $outputDir.'/include/all';
@@ -175,7 +176,7 @@ EOT
         $includes = array(
             'include/all$'.$packageFileHash.'.json' => array( 'sha1'=>$packageFileHash ),
         );
-        
+
         $this->dumpPackagesJson($includes, $output, $filename);
 
         if ($htmlView) {
@@ -326,6 +327,7 @@ EOT
     }
 
     /**
+     * @param Composer        $composer
      * @param array           $config   Directory where to create the downloads in, prefix-url, etc..
      * @param array           $packages Reference to packages so we can rewrite the JSON.
      * @param InputInterface  $input
@@ -335,7 +337,7 @@ EOT
      *
      * @return void
      */
-    private function dumpDownloads(array $config, array &$packages, InputInterface  $input, OutputInterface $output, $outputDir, $skipErrors)
+    private function dumpDownloads(Composer $composer, array $config, array &$packages, InputInterface  $input, OutputInterface $output, $outputDir, $skipErrors)
     {
         if (isset($config['archive']['absolute-directory'])) {
             $directory = $config['archive']['absolute-directory'];
@@ -407,9 +409,24 @@ EOT
                     // Set archive format to `file` to tell composer to download it as is
                     $archiveFormat = 'file';
                 } else {
-                    $path = $archiveManager->archive($package, $format, $directory);
+                    $pathIsTarget = false;
+                    $path = $archiveManager->archivePrepare($package, $format, $directory, $pathIsTarget);
                     $archiveFormat = $format;
+                    if ($pathIsTarget) {
+                        $output->writeln(sprintf("<info>Reusing existing target: '%s'.</info>", $path));
+                    } else {
+                        $output->writeln(sprintf("<info>Executing pre-archive-dump-cmd on '%s'.</info>", $path));
+                        $composer->getEventDispatcher()->dispatch(
+                            'pre-archive-dump-cmd',
+                            new PreArchiveDumpEvent(
+                                'pre-archive-dump-cmd',
+                                $path
+                            )
+                        );
+                        $path = $archiveManager->archiveSourceDump($package, $format, $directory, $path);
+                    }
                 }
+
                 $archive = basename($path);
                 $distUrl = sprintf('%s/%s/%s', $endpoint, $config['archive']['directory'], $archive);
                 $package->setDistType($archiveFormat);
