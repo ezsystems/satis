@@ -20,10 +20,12 @@
         "forum": "https://gitter.com/composer/satis",
         "irc": "irc://freenode.net/composer"
     },
+    "repositories": [{"type": "vcs", "url": "git@github.com:andrerom/composer.git"}],
     "bin": ["bin/satis"],
     "require": {
         "php": "^7.0",
-        "composer/composer": "^1.4",
+        "ext-zip": "*",
+        "composer/composer": "dev-ez_1.8 as 1.8.x-dev",
         "twig/twig": "^1.7 || ^2.0",
         "symfony/console": "^2.1 || ^3.0.4 || ^4.0"
     },

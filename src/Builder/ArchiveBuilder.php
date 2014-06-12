@@ -14,6 +14,9 @@ namespace Composer\Satis\Builder;
 use Composer\Composer;
 use Composer\Factory;
 use Composer\Util\Filesystem;
+use Composer\Package\Archiver\ArchiveManager;
+use Composer\Package\CompletePackage;
+use Composer\Satis\Event\PreArchiveDumpEvent;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -144,11 +147,11 @@ class ArchiveBuilder extends Builder
 
                         if (!file_exists($path)) {
                             $package->setDistType($originalDistType);
-                            $downloaded = $archiveManager->archive($package, $format, $targetDir, null, $ignoreFilters);
+                            $downloaded = $this->archive($archiveManager, $package, $format, $targetDir, $ignoreFilters);
                             $filesystem->rename($downloaded, $path);
                         }
                     } else {
-                        $path = $archiveManager->archive($package, $format, $targetDir, null, $ignoreFilters);
+                        $path = $this->archive($archiveManager, $package, $format, $targetDir, $ignoreFilters);
                     }
                 }
 
@@ -183,6 +186,27 @@ class ArchiveBuilder extends Builder
 
             $this->output->writeln('');
         }
+    }
+
+    private function archive(ArchiveManager $archiveManager, CompletePackage $package, string $format, string $targetDir, bool $ignoreFilters): string
+    {
+        $pathIsTarget = false;
+        $path = $archiveManager->archivePrepare($package, $format, $targetDir, $pathIsTarget);
+        if ($pathIsTarget) {
+            $this->output->writeln(sprintf("<info>Reusing existing target: '%s'.</info>", $path));
+        } else {
+            $this->output->writeln(sprintf("<info>Executing pre-archive-dump-cmd on '%s'.</info>", $path));
+            $this->composer->getEventDispatcher()->dispatch(
+                'pre-archive-dump-cmd',
+                new PreArchiveDumpEvent(
+                    'pre-archive-dump-cmd',
+                    $path
+                )
+            );
+            $path = $archiveManager->archiveSourceDump($package, $format, $targetDir, $path, $ignoreFilters);
+        }
+
+        return $path;
     }
 
     /**
