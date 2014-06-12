@@ -15,6 +15,7 @@ namespace Composer\Satis\Builder;
 
 use Composer\Composer;
 use Composer\Downloader\DownloadManager;
+use Composer\EventDispatcher\Event;
 use Composer\Factory;
 use Composer\Package\Archiver\ArchiveManager;
 use Composer\Package\CompletePackage;
@@ -209,6 +210,8 @@ class ArchiveBuilder extends Builder
                 $packageName = $archiveManager->getPackageFilename($package);
             }
 
+            $this->output->writeln("<notice>Won't be able to run 'pre-archive-dump-cmd' when 'rearchive' is disabled!</notice>");
+
             $path = $targetDir . '/' . $packageName . '.' . $distType;
             if (file_exists($path)) {
                 return $path;
@@ -228,12 +231,33 @@ class ArchiveBuilder extends Builder
 
         if ($overrideDistType) {
             $path = $targetDir . '/' . $packageName . '.' . $format;
-            $downloaded = $archiveManager->archive($package, $format, $targetDir, null, $ignoreFilters);
+            $downloaded = $this->archiveEvent($archiveManager, $package, $format, $targetDir, $ignoreFilters);
             $filesystem->rename($downloaded, $path);
 
             return $path;
         }
 
-        return $archiveManager->archive($package, $format, $targetDir, null, $ignoreFilters);
+        return $this->archiveEvent($archiveManager, $package, $format, $targetDir, $ignoreFilters);
+    }
+
+    private function archiveEvent(ArchiveManager $archiveManager, PackageInterface $package, string $format, string $targetDir, bool $ignoreFilters): string
+    {
+        $pathIsTarget = false;
+        $path = $archiveManager->archivePrepare($package, $format, $targetDir, $pathIsTarget);
+        if ($pathIsTarget) {
+            $this->output->writeln(sprintf("<info>Reusing existing target: '%s'.</info>", $path));
+        } else {
+            $this->output->writeln(sprintf("<info>Executing pre-archive-dump-cmd on '%s'.</info>", $path));
+            $this->composer->getEventDispatcher()->dispatch(
+                'pre-archive-dump-cmd',
+                new Event(
+                    'pre-archive-dump-cmd',
+                    ['package-path' => $path]
+                )
+            );
+            $path = $archiveManager->archiveSourceDump($package, $format, $targetDir, $path, $ignoreFilters);
+        }
+
+        return $path;
     }
 }
