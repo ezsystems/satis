@@ -240,6 +240,14 @@
                 }
             }
         },
+        "scripts": {
+            "type": "object",
+            "description": "Custom script options",
+            "additionalProperties": {
+                "type": ["array"],
+                "description": "A hash of commands"
+            }
+        },
         "notify-batch": {
             "type": "string",
             "description": "a URL that will be called every time a user installs a package."

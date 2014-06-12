@@ -14,6 +14,7 @@ namespace Composer\Satis\Builder;
 use Composer\Composer;
 use Composer\Factory;
 use Composer\Util\Filesystem;
+use Composer\Satis\Event\PreArchiveDumpEvent;
 
 /**
  * Builds the archives of the repository.
@@ -82,8 +83,22 @@ class ArchiveBuilder extends Builder implements BuilderInterface
                     // Set archive format to `file` to tell composer to download it as is
                     $archiveFormat = 'file';
                 } else {
-                    $path = $archiveManager->archive($package, $format, $directory);
+                    $pathIsTarget = false;
+                    $path = $archiveManager->archivePrepare($package, $format, $directory, $pathIsTarget);
                     $archiveFormat = $format;
+                    if ($pathIsTarget) {
+                        $this->output->writeln(sprintf("<info>Reusing existing target: '%s'.</info>", $path));
+                    } else {
+                        $this->output->writeln(sprintf("<info>Executing pre-archive-dump-cmd on '%s'.</info>", $path));
+                        $this->composer->getEventDispatcher()->dispatch(
+                            'pre-archive-dump-cmd',
+                            new PreArchiveDumpEvent(
+                                'pre-archive-dump-cmd',
+                                $path
+                            )
+                        );
+                        $path = $archiveManager->archiveSourceDump($package, $format, $directory, $path);
+                    }
                 }
                 $archive = basename($path);
                 $distUrl = sprintf('%s/%s/%s', $endpoint, $this->config['archive']['directory'], $archive);
