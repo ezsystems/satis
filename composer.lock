@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "b239898e8f3241a0aeb36a4b22e0b6df",
-    "content-hash": "4eddbf1877cbbc3f3e7c208b9bf9e539",
+    "hash": "9da37a362969c6b9bb1214e956c0b2ea",
+    "content-hash": "4d4f76fc92e771ab77801adbba75c707",
     "packages": [
         {
             "name": "composer/composer",
@@ -13,12 +13,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/andrerom/composer.git",
-                "reference": "3d8986609bc3c8b330c0007914c8f7750d1ea2ce"
+                "reference": "3efa686fd6e1f8f8c369e542ef6b18a49945a0fe"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/andrerom/composer/zipball/3d8986609bc3c8b330c0007914c8f7750d1ea2ce",
-                "reference": "3d8986609bc3c8b330c0007914c8f7750d1ea2ce",
+                "url": "https://api.github.com/repos/andrerom/composer/zipball/3efa686fd6e1f8f8c369e542ef6b18a49945a0fe",
+                "reference": "3efa686fd6e1f8f8c369e542ef6b18a49945a0fe",
                 "shasum": ""
             },
             "require": {
@@ -94,7 +94,7 @@
                 "issues": "https://github.com/composer/composer/issues",
                 "source": "https://github.com/andrerom/composer/tree/ez"
             },
-            "time": "2016-02-06 11:33:45"
+            "time": "2016-02-06 16:55:22"
         },
         {
             "name": "composer/semver",
@@ -1701,7 +1701,7 @@
     "prefer-lowest": false,
     "platform": {
         "php": "^5.3.2 || ^7.0",
-        "ext-zlib": "*"
+        "ext-zip": "*"
     },
     "platform-dev": [],
     "platform-overrides": {
