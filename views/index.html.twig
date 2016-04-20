@@ -59,45 +59,6 @@
                             <p>{{ package.highest.description }}</p>
                         {% endif %}
                         <table>
-                            {% if package.highest.homepage %}
-                                <tr>
-                                    <th>Homepage</th>
-                                    <td><a href="{{ package.highest.homepage }}">{{ package.highest.homepage }}</a></td>
-                                </tr>
-                            {% endif %}
-                            {% if package.highest.license %}
-                                <tr>
-                                    <th>License</th>
-                                    <td>{{ package.highest.license|join(', ') }}</td>
-                                </tr>
-                            {% endif %}
-                            {% if package.highest.authors %}
-                                <tr>
-                                    <th>Authors</th>
-                                    <td>
-                                        {% for author in package.highest.authors %}
-                                            {%- if author.homepage -%}
-                                                <a href="{{ author.homepage }}">{{ author.name }}</a>
-                                            {%- else -%}
-                                                {{ author.name }}
-                                            {%- endif -%}
-                                            {%- if not loop.last -%}, {% endif -%}
-                                        {% endfor %}
-                                    </td>
-                                </tr>
-                            {% endif %}
-                            {% if package.highest.support %}
-                            <tr>
-                                <th>Support</th>
-                                <td>
-                                    <ul>
-                                    {% for support_type, support_url in package.highest.support %}
-                                        <li>{{ support_type|capitalize }}: <a href="{{ support_url }}">{{ support_url }}</a></li>
-                                    {% endfor %}
-                                    </ul>
-                                </td>
-                            </tr>
-                            {% endif %}
                             <tr>
                                 <th>Releases</th>
                                 <td>
