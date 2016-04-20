@@ -35,12 +35,12 @@
         </div>
         {% endif %}
 
-        {% if package.highest.homepage %}
+        {#% if package.highest.homepage %}
         <div class="row">
             <div class="col-xs-2 text-xs-left text-sm-right"><strong>Homepage</strong></div>
             <div class="col-xs-12 col-sm-10"><a href="{{ package.highest.homepage }}">{{ package.highest.homepage }}</a></div>
         </div>
-        {% endif %}
+        {% endif %#}
 
         {% if package.highest.license %}
         <div class="row">
@@ -49,7 +49,7 @@
         </div>
         {% endif %}
 
-        {% if package.highest.authors %}
+        {#% if package.highest.authors %}
         <div class="row">
             <div class="col-xs-2 text-xs-left text-sm-right"><strong>Authors</strong></div>
             <div class="col-xs-12 col-sm-10">
@@ -63,7 +63,7 @@
                 {% endfor %}
             </div>
         </div>
-        {% endif %}
+        {% endif %#}
 
         {% if package.highest.support %}
         <div class="row">
