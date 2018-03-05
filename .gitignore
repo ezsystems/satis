@@ -4,3 +4,6 @@
 /composer.phar
 /phpunit.xml
 /satis.phar
+/ci
+/logs
+/web

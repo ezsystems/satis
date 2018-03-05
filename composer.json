@@ -41,6 +41,16 @@
     "autoload-dev": {
         "psr-4": { "Composer\\Satis\\": "tests" }
     },
+    "scripts": {
+        "post-install-cmd": [
+            "mkdir -pv logs web/bul web/ttl web/bul_com web/ttl_com",
+            "cp -nv res/web/errordoc-401.php res/web/errordoc-403.php res/web/index.html res/web/footer.html web/"
+        ],
+        "post-update-cmd": [
+            "mkdir -pv logs web/bul web/ttl web/bul_com web/ttl_com",
+            "cp -nv res/web/errordoc-401.php res/web/errordoc-403.php res/web/index.html res/web/footer.html web/"
+        ]
+    },
     "config": {
         "platform": {
             "php": "7.0"
