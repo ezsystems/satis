@@ -6,3 +6,6 @@
 phpunit.xml
 composer.phar
 satis.phar
+/ci
+/logs
+/web
