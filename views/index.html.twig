@@ -76,7 +76,7 @@
                                 <th>Required by</th>
                                 <td>
                                     {% set package_dependencies = attribute(dependencies, name) %}
-                                    {% if package_dependencies|length %}
+                                    {% if package_dependencies is iterable %}
                                         <ul>
                                             {% for dependency in package_dependencies %}
                                                 <li><a href="#{{ dependency }}">{{ dependency }}</a></li>
