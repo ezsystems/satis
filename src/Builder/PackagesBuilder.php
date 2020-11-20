@@ -87,6 +87,8 @@ class PackagesBuilder extends Builder
             $repo['metadata-url'] = $metadataUrl;
         }
 
+        $repo['available-packages'] = array_keys($packagesByName);
+
         foreach ($packagesByName as $packageName => $versionPackages) {
             $stableVersions = [];
             $devVersions = [];
