@@ -31,6 +31,7 @@ class PurgeCommand extends BaseCommand
             ->setDefinition([
                 new InputArgument('file', InputArgument::OPTIONAL, 'Json file to use', './satis.json'),
                 new InputArgument('output-dir', InputArgument::OPTIONAL, 'Location where to output built files', null),
+                new InputArgument('dry-run', InputArgument::OPTIONAL, 'Dry run, allows to inspect what might be deleted', null),
             ])
             ->setHelp(
 <<<'EOT'
@@ -69,6 +70,12 @@ EOT
         if (null === $outputDir) {
             throw new \InvalidArgumentException('The output dir must be specified as second argument or be configured inside ' . $input->getArgument('file'));
         }
+
+        $dryRun = (bool) $input->getArgument('dry-run');
+        if ($dryRun) {
+            $output->writeln('<notice>Dry run enabled, no actual changes will be done.</notice>');
+        }
+
 
         $packageSelection = new PackageSelection($output, $outputDir, $config, false);
         $packages = $packageSelection->load();
@@ -121,7 +128,9 @@ EOT
         }
 
         foreach ($unreferenced as $file) {
-            unlink($file->getPathname());
+            if (!$dryRun) {
+                unlink($file->getPathname());
+            }
 
             $output->writeln(sprintf(
                 '<info>Removed archive</info>: <comment>%s</comment>',
@@ -129,7 +138,9 @@ EOT
             ));
         }
 
-        $this->removeEmptyDirectories($output, $distDirectory);
+        if (!$dryRun) {
+            $this->removeEmptyDirectories($output, $distDirectory);
+        }
 
         $output->writeln('<info>Done.</info>');
 
